@@ -1,11 +1,18 @@
+/*
+project tile: personal tasks management
+
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 struct task {
-    char name[100];
+    int task_num;
+    char task_name;
     int done;
-    struct task *next;
+    struct task *previous, *next;
 };
 
 struct task *start = NULL; /* global variable */
@@ -13,8 +20,6 @@ struct task *start = NULL; /* global variable */
 /*------------------------------------------------------------------------ */
 
 /* function prototypes */
-int read_int();
-void read_line(char *buffer, int size); /* i created two separate functions to handle input data to stay away from buffer trouble. */
 
 struct task *createnode();
 void traverse();
@@ -50,7 +55,7 @@ int main() {
         printf("0. Exit\n");
         printf("Choice: ");
         
-        choice = read_int();  /* as i've created a separate thing for input, so i'll just let it handle it, too! */
+        scanf("%d", &choice);  /* as i've created a separate thing for input, so i'll just let it handle it, too! */
 
         switch (choice) {
             case 1:
@@ -93,37 +98,82 @@ int main() {
 
 /*___________________________________________________________________ */
 
-int read_int(){
-    int x;
-    scanf("%d", &x);
-    getchar();
-    return x;
-}
-
-void read_line(char *buffer, int size){
-    // nothing 
+void traverse(){
+    if(start == NULL) printf("No tasks registered\n");
+    else{
+        struct task *i = start;
+        while(i != NULL){
+            printf("[%d] Task: \n", i -> task_num, i -> task_name);
+        }
+    }
 }
 
 
 struct task *createnode(){
-    // nothing
+    int a;
+    char b;
+    printf("Enter task number: ");
+    scanf("%d", &a);
+    printf("Enter task  name: ");
+    scanf(" %c", &b);
+
+    struct task *newnode;
+    newnode = (struct task*)malloc(sizeof(struct task));
+    newnode -> task_num = a;
+    newnode -> task_name = b;
+    newnode -> previous = NULL;
+    newnode -> next = NULL;
+
+    return newnode;
+    
 }
 
-void traverse(){
-    printf("call travers\n");
-}
+
 
 void insert_first(){
-    printf("insrt_first\n");
+    struct task *newnode = createnode();
+    if(start == NULL) start = newnode;
+    else{
+        start -> previous = newnode;
+        newnode -> next = start;
+        start = newnode;
+    }
 }
 
 void insert_last(){
-    printf("insert_last\n");
+    struct task *newnode = createnode();
+    if(start == NULL) start = newnode;
+    else{
+        struct task *i = start;
+        while(i -> next != NULL){
+            i = i -> next;
+        }
+
+        newnode -> previous = i;    
+        i -> next = newnode;
+    }
 }
 
 
 void insert_any(){
-    printf("any\n");
+    struct task *newnode = createnode();
+    int position;
+    printf("Enter the task number you insert after: ");
+    scanf("%d", &position);
+
+    if(start == NULL) start = newnode;
+    else{
+        struct task *i = start;
+        while(i != NULL){
+            if(i -> task_num == position){
+                newnode -> previous = i;
+                newnode -> next = i -> next;
+                if(i -> next != NULL) i -> next -> previous = newnode;
+                i -> next = newnode;
+            }
+            i = i -> next;
+        }
+    }
 }
 
 
